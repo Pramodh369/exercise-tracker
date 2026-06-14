@@ -64,7 +64,12 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
       return res.status(404).json({ error: 'User not found' })
     }
 
-    const date = req.body.date ? new Date(req.body.date) : new Date()
+let dateInput = req.body.date;
+let date = (!dateInput || dateInput.trim() === "") ? new Date() : new Date(dateInput);
+
+if (isNaN(date.getTime())) {
+  date = new Date();
+}
 
     const exercise = new Exercise({
       userId: user._id,
