@@ -103,22 +103,26 @@ app.get('/api/users/:_id/logs', async (req, res) => {
 
     const filter = { userId: user._id }
 
-    // Apply date filters
-    if (req.query.from || req.query.to) {
-      filter.date = {}
-      if (req.query.from) {
-        filter.date.$gte = new Date(req.query.from)
-      }
-      if (req.query.to) {
-        filter.date.$lte = new Date(req.query.to)
-      }
+    
+  // Apply date filters 
+  const { from, to, limit } = req.query;
+  if (from || to) {
+    filter.date = {}
+    if (from) {
+      const fromDate = new Date(from);
+      if (!isNaN(fromDate.getTime())) filter.date.$gte = fromDate;
     }
+    if (to) {
+      const toDate = new Date(to);
+      if (!isNaN(toDate.getTime())) filter.date.$lte = toDate;
+    }
+  }
 
     let query = Exercise.find(filter).select('description duration date')
 
-    if (req.query.limit) {
-      query = query.limit(parseInt(req.query.limit))
-    }
+if (limit) {
+  query = query.limit(parseInt(limit))
+}
 
     const exercises = await query.exec()
 
